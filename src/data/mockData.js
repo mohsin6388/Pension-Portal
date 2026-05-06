@@ -94,6 +94,12 @@ export const departments = [
   "Finance",
   // "Sanitation",
 ];
+
+export const familyMember = [
+  "Father Name",
+  "Husband Name",
+  "Dependent Name",
+]
 export const designations = ["Clerk", "Officer", "Supervisor", "Junior Engineer"];
 export const categories = ['A', 'B', 'C', 'D'];
 export const castes = ['General', 'OBC', 'SC', 'ST'];
