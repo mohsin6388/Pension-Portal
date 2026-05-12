@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, createContext, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { User, Lock, Building2, ChevronDown, RefreshCw } from "lucide-react";
@@ -11,15 +11,17 @@ const generateCaptcha = () => {
 };
 
 const Login = () => {
-  const [form, setForm] = useState({ username: '', password: '', captcha: '' });
+  const [form, setForm] = useState({ username: '', password: '', captcha: '', role: '' });
   const [captchaText, setCaptchaText] = useState(generateCaptcha());
   const [error, setError] = useState('');
   const [lang, setLang] = useState('hi');
   const [loading, setLoading] = useState(false);
   const [departments, setDepartments] = useState([
-    { id: 1, name: "Finance" },
-    { id: 2, name: "IT Department" },
-    { id: 3, name: "Civil Department" },
+    { id: 1, name: "Accounts" },
+    { id: 2, name: "Engineering" },
+    { id: 4, name: "Tax" },
+    { id: 5, name: "Care Taker" },
+    { id: 6, name: "Lighting" },
   ]);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -50,14 +52,17 @@ const Login = () => {
     e.preventDefault();
     setLoading(true)
 
-    if (!form.username || !form.password) {
-      setError("Please enter username and password.");
+    // console.log(form);
+
+    if (!form.username || !form.password || !form.role) {
+      setError("Please enter username, password, and role.");
+      setLoading(false)
       return;
     }
 
     if (form.captcha.toUpperCase() !== captchaText) {
       setError("Incorrect captcha. Please try again.");
-
+      setLoading(false);
       setCaptchaText(generateCaptcha());
 
       setForm((f) => ({
@@ -81,15 +86,17 @@ const Login = () => {
         body: JSON.stringify({
           username: form.username,
           password: form.password,
+          role: form.role,
         }),
       });
 
       const result = await response.json();
 
-      console.log(result);
+      // console.log(result);
 
       if (!response.ok) {
         setError(result.message || "Login failed");
+        setLoading(false)
         return;
       }
 
@@ -97,14 +104,14 @@ const Login = () => {
 
       if (success) {
         localStorage.setItem("token", data.token);
+        login(data.user);
 
-        localStorage.setItem("user", JSON.stringify(data.user));
         setLoading(false)
         navigate("/dashboard");
       }
     } catch (error) {
       console.error(error);
-
+      setLoading(false)
       setError("Server error");
     }
   };
@@ -412,9 +419,29 @@ const Login = () => {
                     </span>
 
                     {/* Dropdown */}
-                    <select
+                    {/* <select
                       name="department"
                       value={form.department}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded px-3 py-2 pl-9 pr-10 text-sm focus:outline-none focus:border-blue-500 appearance-none bg-white"
+                      style={{
+                        fontFamily: "'Noto Sans Devanagari', sans-serif",
+                      }}
+                    >
+                      <option value="">
+                        {isHindi ? "विभाग चुनें" : "Select Department"}
+                      </option>
+
+                      {departments.map((dept) => (
+                        <option key={dept.id} value={form.role}>
+                          {dept.name}
+                        </option>
+                      ))}
+                    </select> */}
+
+                    <select
+                      name="role"
+                      value={form.role}
                       onChange={handleChange}
                       className="w-full border border-gray-300 rounded px-3 py-2 pl-9 pr-10 text-sm focus:outline-none focus:border-blue-500 appearance-none bg-white"
                       style={{

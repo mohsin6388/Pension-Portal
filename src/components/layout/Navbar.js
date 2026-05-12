@@ -74,7 +74,7 @@ const Navbar = () => {
 
         {/* User info */}
         <div className="text-right">
-          <div className="text-amber-400 font-semibold text-sm">Operator</div>
+          <div className="text-amber-400 font-semibold text-lg"><span>{user?.role}</span> Operator</div>
           <div className="text-blue-200 text-xs">
             Kanpur Municipal Corporation
           </div>
@@ -281,7 +281,7 @@ const Navbar = () => {
                   : "text-blue-200 hover:text-white"
               }`}
             >
-              Arrea
+              Arrear
             </Link>
           </div>
 

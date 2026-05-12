@@ -8,6 +8,7 @@ import  Loading  from "../components/ui/Loading"
 import  Notification from "../components/ui/Notify"
 import { AlertTriangle } from "lucide-react";
 import ApplicantView from "./ApplicantView";
+import { useAuth } from '../context/AuthContext';
 
 import {
   InputField,
@@ -32,16 +33,17 @@ import {
   banks,
 } from "../data/mockData";
 
-// ─── Initial State ────────────────────────────────────────────────────────────
-const initialForm = {
+
+
+const initialForm = (user) => ({
   employeeId: "",
   ppoNo: "",
   employeeName: "",
   // dependentName: "",
   relation: "",
-  relationName:"",
+  relationName: "",
   // familyName: "",
-  department: "Finance",
+  department: `${user.role}`,
   designation: "",
   aadhaar: "",
   pan: "",
@@ -73,7 +75,8 @@ const initialForm = {
   signature: null,
   salarySlip: null,
   deathCertificate: null,
-};
+});
+
 
 // ─── Step Config ──────────────────────────────────────────────────────────────
 const STEPS = [
@@ -150,7 +153,12 @@ const StepBar = ({ current }) => (
 const AddApplicant = () => {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState(initialForm);
+  const { user } = useAuth();
+
+  // console.log("checking ",user)
+
+
+  const [form, setForm] = useState(initialForm(user));
   const [errors, setErrors] = useState({});
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -162,6 +170,8 @@ const AddApplicant = () => {
     type: "",
     message: "",
   });
+
+  // ─── Initial State ────────────────────────────────────────────────────────────
 
   // ── Handle Change ────────────────────────────────────────────────────────
   const handleChange = (e) => {
@@ -235,7 +245,6 @@ const AddApplicant = () => {
       return;
     }
 
-
     setForm((p) => ({ ...p, [name]: files ? files[0] : value }));
     // if (errors[name]) setErrors((p) => ({ ...p, [name]: "" }));
     if (errors[name]) {
@@ -283,23 +292,15 @@ const AddApplicant = () => {
     }
 
     if (s === 2) {
-      [
-        "designation",
-        "retirementDate",
-        "pfms",
-        "gradePay",
-      ].forEach((f) => {
+      ["designation", "retirementDate", "pfms", "gradePay"].forEach((f) => {
         if (!form[f]) errs[f] = "Required";
       });
-
 
       // PFMS Validation
 
       // if (form.pfms && !/^[A-Z0-9]{6,25}$/.test(form.pfms)) {
       //   errs.pfms = "Invalid PFMS ID";
       // }
-
-    
     }
 
     if (s === 3) {
@@ -330,7 +331,7 @@ const AddApplicant = () => {
     // }
 
     console.log("Validation Errors:", errs);
-     
+
     setErrors(errs);
 
     return Object.keys(errs).length === 0;
@@ -446,7 +447,6 @@ const AddApplicant = () => {
 
       const user = JSON.parse(localStorage.getItem("user"));
 
-
       const res = await fetch(`${API}/api/pensioners`, {
         method: "POST",
         headers: {
@@ -460,8 +460,7 @@ const AddApplicant = () => {
       const { message, success } = data;
       // if (!res.ok) throw new Error(data.message || "Server Error");
 
-      if(success){
-
+      if (success) {
         setNotification({
           open: true,
           type: "success",
@@ -470,25 +469,20 @@ const AddApplicant = () => {
 
         setTimeout(() => {
           navigate("/dashboard");
-        }, 3000);
-
+        }, 2000);
       } else {
         setNotification({
           open: true,
           type: "error",
           message: "Pensioner Not Added.",
         });
-
       }
-      
-  
-
     } catch (err) {
       setNotification({
         open: true,
         type: "error",
         message: err.message || "Submit Failed",
-      }); 
+      });
     } finally {
       setLoading(false);
     }
@@ -1474,6 +1468,6 @@ const AddApplicant = () => {
       </div>
     </>
   );
-};
+};;
 
 export default AddApplicant;

@@ -6,6 +6,7 @@ import ActionBar from "../components/layout/ActionBar";
 import Breadcrumb from "../components/ui/Breadcrumb";
 import Loader  from "../components/ui/Loading";
 import { Search } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 const StatusBadge = ({ status }) => {
   const styles = {
@@ -33,6 +34,7 @@ const StatusBadge = ({ status }) => {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { user } = useAuth()
 
   const [search, setSearch] = useState("");
 
@@ -48,7 +50,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const departmentId = 4;
+      const departmentId = user.id;
 
       try {
         const res = await fetch(
