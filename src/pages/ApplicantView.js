@@ -148,6 +148,9 @@ const ApplicantView = () => {
 
           <Field label="Date of Death" value={formatDate(data.date_of_death)} />
 
+          </Section>
+
+
           {/* PENSION CATEGORY */}
 
           <Section title="Pension Category">
@@ -174,6 +177,9 @@ const ApplicantView = () => {
               value={`₹ ${Number(data.last_salary_drawn || 0).toLocaleString()}`}
             />
           </Section>
+
+
+          <Section title="Financial Details">
 
           <Field label="Basic Salary" value={data.basic_salary} />
 

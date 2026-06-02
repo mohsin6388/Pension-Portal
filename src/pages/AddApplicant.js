@@ -34,12 +34,12 @@ import {Camera,
 import {
   familyMember,
   departments,
-  designations,
+  // designations,
   categories,
   castes,
   accountTypes,
   banks,
-  subDepartments,
+  // subDepartments,
   payCommissions
 } from "../data/mockData";
 
@@ -169,6 +169,7 @@ const AddApplicant = () => {
   const navigate = useNavigate();
 
   const { user } = useAuth();
+  console.log("Current User in AddApplicant:", user);
 
   const [form, setForm] = useState(initialForm(user));
   const [errors, setErrors] = useState({});
@@ -176,6 +177,8 @@ const AddApplicant = () => {
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [panError, setPanError] = useState("");
+  const [subDepartments, setSubDepartments] = useState([]);
+  const [designations, setDesignations] = useState([]);
 
   //================ Category POP UP ==============================
   const [showCategoryPopup, setShowCategoryPopup] = useState(true);
@@ -188,6 +191,61 @@ const AddApplicant = () => {
     type: "",
     message: "",
   });
+
+  async function fetchSubDepartments() {
+    try {
+      const response = await fetch(`${API}/api/administrator/sub-departments`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch sub-departments");
+      }
+
+      const data = await response.json();
+      const filteredSubDepartments = data.data
+       .filter((item) => item.department_name === user.role)
+       .map((item) => item.sub_department_name);
+
+       console.log("Fetched Sub-Departments:", filteredSubDepartments);
+
+      setSubDepartments(filteredSubDepartments);
+
+
+    } catch (error) {
+      console.error("Error fetching sub-departments:", error);
+    }
+  }
+
+  async function fetchDesignations() {
+    try {
+      const response = await fetch(`${API}/api/administrator/designations`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+
+       const designationNames = data.data.map(
+         (item) => item.designation_name
+       );
+
+       setDesignations(designationNames);
+             
+    } catch (error) {
+      console.error("Error fetching designations:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchSubDepartments();  
+    fetchDesignations();
+  }, []);
+
 
 
   console.log("==============> USER ROLE ->", form.department);

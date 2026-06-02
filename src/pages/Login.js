@@ -1,4 +1,4 @@
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, createContext, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { User, Lock, Building2, ChevronDown, RefreshCw } from "lucide-react";
@@ -17,14 +17,40 @@ const Login = () => {
   const [lang, setLang] = useState('hi');
   const [loading, setLoading] = useState(false);
   const [departments, setDepartments] = useState([
-    { id: 1, name: "Accounts" },
-    { id: 2, name: "Engineering" },
-    { id: 3, name: "Tax" },
-    { id: 4, name: "Lighting" },
-    { id: 5, name: "Care Taker" },
+    // { id: 1, name: "Accounts" },
+    // { id: 2, name: "Engineering" },
+    // { id: 3, name: "Tax" },
+    // { id: 4, name: "Lighting" },
+    // { id: 5, name: "Care Taker" },
   ]);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await fetch(`${API}/api/administrator/departments`,{
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const result = await response.json();
+
+      if (response.ok) {
+        setDepartments(result.data);
+      } else {
+        console.error("Failed to fetch departments:", result.message);
+      }
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+
+
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -296,55 +322,6 @@ const Login = () => {
           </div>
         </div>
 
-        {/* <div
-          className="w-[60%] relative overflow-hidden bg-cover bg-center"
-          style={{
-            backgroundImage: `
-      linear-gradient(rgba(15,23,42,0.75), rgba(30,41,59,0.85)),
-      url("https://kmc.up.nic.in/images/slide93070171741770456.jpeg?1778221503")
-    `,
-          }}
-        >
-        
-          <div className="absolute inset-0 flex items-center justify-center backdrop-blur-[1px]">
-            <div className="text-center text-white px-8">
-              <div className="w-32 h-32 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center mx-auto mb-6 border border-white/20 shadow-2xl">
-                <span className="text-6xl">🏛️</span>
-              </div>
-
-              <h2 className="text-4xl font-bold mb-3 tracking-wide">
-                Municipal Corporation Portal
-              </h2>
-
-              <p className="text-blue-100 text-lg font-medium">
-                Department of Citizen Services
-              </p>
-
-              <p className="text-blue-200 text-sm mt-4 max-w-sm mx-auto leading-6">
-                Manage pension applications, approvals, and records for Kanpur
-                Municipal Corporation employees.
-              </p>
-
-              <div className="flex justify-center gap-8 mt-10 text-blue-100 text-sm">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">500+</div>
-                  <div>Pensioners</div>
-                </div>
-
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">24/7</div>
-                  <div>Support</div>
-                </div>
-
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">100%</div>
-                  <div>Digital</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> */}
-
         {/* Right: login form */}
         <div className="w-[40%] flex items-center justify-center p-16 bg-white shadow-2xl">
           <div className="w-full">
@@ -436,7 +413,7 @@ const Login = () => {
 
                       {departments.map((dept) => (
                         <option key={dept.id} value={dept.name}>
-                          {dept.name}
+                          {dept.department_name}
                         </option>
                       ))}
                     </select>
