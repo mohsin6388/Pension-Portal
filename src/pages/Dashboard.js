@@ -48,18 +48,51 @@ const Dashboard = () => {
   // FETCH DATA
   // =========================
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const departmentId = user.id;
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const departmentId = user.id;
 
+  //     try {
+  //       const res = await fetch(
+  //         `${API}/api/pensioners/department/${departmentId}`,
+  //       );
+
+  //       const data = await res.json();
+
+  //       console.log(data);
+
+  //       if (data.success) {
+  //         setApplicants(data.data);
+  //       }
+  //     } catch (err) {
+  //       console.error("Error fetching pensioners:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
+    useEffect(() => {
+    const fetchData = async () => {
       try {
+        // user.id department ki id nahi hai, isliye naam se department dhundo
+        const deptRes = await fetch(`${API}/api/administrator/departments`);
+        const deptData = await deptRes.json();
+        const dept = (deptData.data || []).find(
+          (d) => d.department_name === user?.role,
+        );
+
+        if (!dept) {
+          return;
+        }
+
         const res = await fetch(
-          `${API}/api/pensioners/department/${departmentId}`,
+          `${API}/api/pensioners/department/${dept.id}`,
         );
 
         const data = await res.json();
-
-        console.log(data);
 
         if (data.success) {
           setApplicants(data.data);
@@ -72,7 +105,7 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, []);
+  }, [user]);
 
   // =========================
   // STATS
